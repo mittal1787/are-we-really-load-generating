@@ -11,6 +11,7 @@ const (
 	delta       = 100 * time.Millisecond
 	duration    = time.Minute
 	serverPort  = 8080
+	serverName  = "localhost"
 	workerCount = 100
 )
 
@@ -35,13 +36,18 @@ func main() {
 }
 
 func worker(start chan bool, stop chan bool) {
+	client := &http.Client{}
+	requestURL := fmt.Sprintf("http://%s:%d", serverName, serverPort)
 	// signal to start working
 	<-start
 
 	for {
 		select {
 		case <-time.After(delta):
-			go sendRequest()
+			_, err := client.Get(requestURL)
+			if err != nil {
+				fmt.Print(err)
+			}
 		case <-stop:
 			return
 		}
