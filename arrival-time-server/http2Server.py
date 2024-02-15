@@ -6,8 +6,8 @@ app = Quart(__name__)
 time_map = {}
 f = open('timestamp.txt', 'w')
 @app.route("/")
-def hello_world():
-    # print("Data size = ", len(await request.get_data()))
+async def hello_world():
+    print("Data size = ", len(await request.get_data()))
     arrival_time = time.time()
     f = open("timestamp.txt","a")
     print(arrival_time,file=f)
