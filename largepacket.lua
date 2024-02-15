@@ -19,4 +19,4 @@ response = function(status, headers, body)
     print(body)
     -- admin_token = "Bearer " .. body["data"]["token"]
     print(status)
-end!
+end
