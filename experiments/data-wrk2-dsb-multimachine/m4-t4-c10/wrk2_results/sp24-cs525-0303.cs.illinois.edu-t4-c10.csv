@@ -1,0 +1,201 @@
+Running 30s test @ http://clnode028.clemson.cloudlab.us
+  1 threads and 2 connections
+
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+  Thread calibration: mean lat.: 1749.719ms, rate sampling interval: 7061ms
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+reconnect_socket
+
+-----------------------------------------------------------------------
+Test Results @ http://clnode028.clemson.cloudlab.us 
+  Thread Stats   Avg      Stdev     99%   +/- Stdev
+    Latency     2.07s     1.02s    4.02s    64.58%
+    Req/Sec   281.00    281.00   562.00    100.00%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%    2.12s 
+ 75.000%    2.80s 
+ 90.000%    3.52s 
+ 99.000%    4.02s 
+ 99.900%    4.03s 
+ 99.990%    4.03s 
+ 99.999%    4.03s 
+100.000%    4.03s 
+
+  Detailed Percentile spectrum:
+       Value   Percentile   TotalCount 1/(1-Percentile)
+
+      27.951     0.000000            1         1.00
+     569.855     0.100000          400         1.11
+    1105.919     0.200000          800         1.25
+    1528.831     0.300000         1191         1.43
+    1836.031     0.400000         1588         1.67
+    2115.583     0.500000         1987         2.00
+    2217.983     0.550000         2185         2.22
+    2355.199     0.600000         2385         2.50
+    2521.087     0.650000         2583         2.86
+    2674.687     0.700000         2788         3.33
+    2797.567     0.750000         2978         4.00
+    2883.583     0.775000         3080         4.44
+    2949.119     0.800000         3185         5.00
+    3082.239     0.825000         3283         5.71
+    3217.407     0.850000         3378         6.67
+    3368.959     0.875000         3476         8.00
+    3436.543     0.887500         3527         8.89
+    3522.559     0.900000         3585        10.00
+    3590.143     0.912500         3636        11.43
+    3655.679     0.925000         3680        13.33
+    3723.263     0.937500         3722        16.00
+    3735.551     0.943750         3751        17.78
+    3811.327     0.950000         3780        20.00
+    3850.239     0.956250         3796        22.86
+    3876.863     0.962500         3825        26.67
+    3887.103     0.968750         3856        32.00
+    3889.151     0.971875         3859        35.56
+    3952.639     0.975000         3885        40.00
+    3952.639     0.978125         3885        45.71
+    3991.551     0.981250         3902        53.33
+    3993.599     0.984375         3910        64.00
+    4016.127     0.985938         3917        71.11
+    4018.175     0.987500         3922        80.00
+    4020.223     0.989062         3930        91.43
+    4022.271     0.990625         3944       106.67
+    4022.271     0.992188         3944       128.00
+    4022.271     0.992969         3944       142.22
+    4024.319     0.993750         3950       160.00
+    4024.319     0.994531         3950       182.86
+    4026.367     0.995313         3961       213.33
+    4026.367     0.996094         3961       256.00
+    4026.367     0.996484         3961       284.44
+    4026.367     0.996875         3961       320.00
+    4026.367     0.997266         3961       365.71
+    4026.367     0.997656         3961       426.67
+    4028.415     0.998047         3969       512.00
+    4028.415     1.000000         3969          inf
+#[Mean    =     2071.241, StdDeviation   =     1018.929]
+#[Max     =     4026.368, Total count    =         3969]
+#[Buckets =           27, SubBuckets     =         2048]
+-----------------------------------------------------------------------
+  12222 requests in 30.02s, 10.01MB read
+  Socket errors: connect 0, read 1, write 0, timeout 20
+Requests/sec:    407.19  
+Transfer/sec:    341.57KB

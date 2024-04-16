@@ -1,0 +1,3 @@
+PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+80641 yugm2     20   0 4812896 612936   4228 D  50.0  16.4   0:00.09 wrk
+80641 yugm2     20   0 5927832 982636   4228 S 116.7  26.3   0:01.34 wrk
