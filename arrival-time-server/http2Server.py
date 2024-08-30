@@ -12,6 +12,7 @@ async def hello_world():
     f = open("timestamp.txt","a")
     print(arrival_time,file=f)
     f.close()
+    # print("Latency:", time.time() - arrival_time)
     return "1"
 
 @app.route("/dummy")
