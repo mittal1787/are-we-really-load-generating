@@ -1,8 +1,8 @@
-# Experiment 5 (Two Servers)
+# Experiment 6 (Two Servers, but second one complex)
 
 **This test requires the usage of two server machines**
 
-For this experiment, we run a distributed system of two servers and run the load generator tests against this distributed system.
+For this experiment, we run a distributed system of two servers and run the load generator tests against this distributed system. This time, the second server will be doing a complex operation of some sort.
 
 ## Prerequisites
 Make sure `go` is installed in the server machines.
@@ -51,10 +51,10 @@ python3 latencyHistogram.py timestamp.txt
 ```
 
 ### Hypothesis
-For a distributed set of servers, the load generator will fail to generate the correct load across the server due to the first server holding back when waiting for the second server. In other words, wrk2 will violate the conditions for open-loop as the first server depending on the second server is going to slow down the requests for the client.
+For a distributed set of servers, the load generator will fail to generate the correct load across the server due to the first server holding back when waiting for the second server, and since second server is more work heavy, there is going to be a . 
 
 ## Tail Latency test
-Ground truth: use `tcpdump` to measure the tail latency on the client side as well as the first server. 
+Ground truth: use `tcpdump` to measure the tail latency on the client side. 
 
 ```
 sudo tcpdump | grep <server-hostname>
@@ -62,17 +62,15 @@ sudo tcpdump | grep <server-hostname>
 
 With the server results, to measure the tail latencies, measure the difference between the timestamps of when the packet was sent and when the packet was recieved. `tcpdump` gets the packets at the network layer as opposed to the application layer, so the latency by `tcpdump` discards the client queueing delay. 
 
-Moreover, to see some latency change across the second server, `tcpdump` across the first server can see the packets sent from the first server to the second server and compute the latency between the two server.
-
 ### Hypothesis
 
-Many workload generators, particularly wrk2 family workload generators, will fail to record the accurate tail latency due to client side queueing delay. Moreover, due to variations among distributed systems, there will be more errors in recording the tail latency accurately.
+Many workload generators, particularly wrk2 family workload generators, will fail to record the accurate tail latency due to client side queueing delay. 
 
 ### Important update
-You can make modifications to main.go and add some line of code that will make some sort of impact on the tail latency. However, the tail latency from the workload generators should match nearly that of what tcpdump returns.
+You can make modifications to main.go and add some line of code that will make some sort of impact on the tail latency. However, the tail latency from the workload generators should match nearly that of what tcpdump returns
 
 ## Tests to run
-For wrk2 family workload generators, run the tests for 100 RPS, 200 RPS, 250 RPS, 500 RPS, 1000 RPS, 2000 RPS, 2500 RPS, 5000 RPS, 10000 RPS, 20000 RPS, 25000 RPS, 50000 RPS, 100000 RPS. Run the thread combinations of 1 thread, 2 threads, 4 threads, 8 threads, 10 threads, 12 threads, 16 threads, and 24 threads. Try 10, 20, 25, 50, 100, 200, 500, 1000, and 10000 connections. 
+For wrk2 family workload generators, run the tests for 100 RPS, 200 RPS, 250 RPS, 500 RPS, 1000 RPS, 2000 RPS, 2500 RPS, 5000 RPS, 10000 RPS, 20000 RPS, 25000 RPS, 50000 RPS, 100000 RPS, 200000 RPS, 500000 RPS, 1000000 RPS. Run the thread combinations of 1 thread, 2 threads, 4 threads, 8 threads, 10 threads, 12 threads, 16 threads, and 24 threads. Try 10, 20, 25, 50, 100, 200, 500, 1000, 10000, and 100000 connections.
 
 Repeat similar experiments for other workload generators as well.
 
