@@ -1,12 +1,10 @@
 # Experiment 3 (DeathStarBench HotelReservation)
-
 For this experiment, we run HotelReservation from DeathStarBench and run the load generator tests against DeathStarBench.
 
 ## Prerequisites
 Make sure docker is installed before running the HotelReservation application. Running `sh install.sh` will install docker and run the DeathStarBench HotelReservation
 
 ### Run DeathStarBench HotelReservation
-
 Clone [DeathStarBench repository](https://github.com/delimitrou/DeathStarBench.git). Change to the DeathStarBench hotelReservation directory and run `docker compose` to install the docker containers. 
 
 ### Shell scripts
@@ -14,6 +12,9 @@ Unlike simple servers, we have to run a custom wrk2 lua script for providing the
 
 ## Throughput test
 Jaeger tracing can be used to verify the throughput across the server. 
+
+### Distribution Type test (Not applicable to Gil Tene's wrk2)
+Ground truth: The throughput per second should match that of the expected arrivals (i.e exponential graph for exponential distribution, exponential distribution ). The overall load though should match RPS x duration.
 
 ### Hypothesis
 For higher RPS, wrk2 family of workload generators will fail to generate the correct throughput across the server due to complexities of the hotelReservation application.
@@ -30,8 +31,10 @@ With the server results, to measure the tail latencies, measure the difference b
 ### Jaeger Tracing
 To measure the tail latency on the server side, Jaeger tracing can be utilized. For each request, one must sum up the latencies of all the traces as long as they do not overlap.
 
-### Hypothesis
+### Distribution Type test (Not applicable to Gil Tene's wrk2)
+Ground truth: Exponential distribution/Ramping should have smaller tail latencies than that of fixed. Zipf should have higher tail latencies than that of fixed. 
 
+### Hypothesis
 Many workload generators, particularly wrk2 family workload generators, will fail to record the accurate tail latency due to client side queueing delay. 
 
 ## Tests to run
@@ -42,3 +45,5 @@ Repeat similar experiments for other workload generators as well.
 Two versions of this experiment:
 * Client and server in same cluster
 * Client and server in two different clusters
+
+Also change the distribution type of the workload generators (i.e exp, zipf, fixed) to conduct the distribution type tests.

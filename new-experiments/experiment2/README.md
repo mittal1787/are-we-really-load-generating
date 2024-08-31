@@ -41,6 +41,9 @@ After running the workload generator on the client machine against the server ma
 python3 latencyHistogram.py timestamp.txt
 ```
 
+### Distribution Type test (Not applicable to Gil Tene's wrk2)
+Ground truth: The throughput per second should match that of the expected arrivals (i.e exponential graph for exponential distribution, exponential distribution ). The overall load though should match RPS x duration.
+
 ### Hypothesis
 If we do an RPS of 100 or higher on Gil Tene's wrk2, then the server experiences a workload much lesser than that of 100 (as server is stressed) and the workload generators are not able to generate the desired load, violating the critieria for open-loop behavior (where wrk2 becomes closed-loop as it is depending on server behavior). Similar case for DeathStarBench wrk2, but slightly higher RPS.  
 
@@ -52,6 +55,9 @@ sudo tcpdump | grep <server-hostname>
 ```
 
 With the server results, to measure the tail latencies, measure the difference between the timestamps of when the packet was sent and when the packet was recieved. `tcpdump` gets the packets at the network layer as opposed to the application layer, so the latency 
+
+### Distribution Type test (Not applicable to Gil Tene's wrk2)
+Ground truth: Exponential distribution/Ramping should have smaller tail latencies than that of fixed. Zipf should have higher tail latencies than that of fixed. 
 
 ### Hypothesis
 
@@ -65,3 +71,5 @@ Repeat similar experiments for other workload generators as well.
 Two versions of this experiment:
 * Client and server in same cluster
 * Client and server in two different clusters
+
+Also change the distribution type of the workload generators (i.e exp, zipf, fixed) to conduct the distribution type tests.
