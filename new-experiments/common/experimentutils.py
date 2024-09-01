@@ -86,6 +86,19 @@ def run_server(server_machine_name: str, thread_count: int, conn_count: int, rps
     file_to_write.close()
     print("Finished running server")
 
+def install_wrk2(client_hostname:str):
+    ssh_con = paramiko.SSHClient()
+    ssh_con.load_system_host_keys()
+    ssh_con.connect(client_hostname, username="yugm2")
+    ssh_con.exec_command("git clone https://github.com/mittal1787/are-we-really-load-generating.git")
+    ssh_con.exec_command("cd are-we-really-load-generating/new-experiments")
+    stdin, stdout, stderr = ssh_con.exec_command("sh install_wrk2.sh")
+    try:
+        stdin.write("Y\n")
+        stdin.flush()
+    except OSError:
+        pass
+
 def run_wrk2(client_hostname:str, server_machine_name: str, experiment_name: str):
     os.makedirs(DATA_DIR, exist_ok=True)
     configs = itertools.product(conn_counts, thread_counts)
