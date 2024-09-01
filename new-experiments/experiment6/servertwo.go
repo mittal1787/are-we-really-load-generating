@@ -25,11 +25,11 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now().UnixNano())
-	prod := 1
+	sum := 0
 	for i := 1; i < 100000; i++ {
 		for j := 1; j < 100000; j++ {
-			prod *= i*j
+			sum += i+j
 		}
 	}
-	fmt.Fprint(w, prod)
+	fmt.Fprint(w, sum)
 }

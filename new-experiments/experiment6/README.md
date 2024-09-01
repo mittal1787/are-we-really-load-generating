@@ -51,7 +51,7 @@ python3 latencyHistogram.py timestamp.txt
 ```
 
 ### Hypothesis
-For a distributed set of servers, the load generator will fail to generate the correct load across the server due to the first server holding back when waiting for the second server, and since second server is more work heavy, there is going to be a . 
+For a distributed set of servers, the load generator will fail to generate the correct load across the server due to the first server holding back when waiting for the second server, and since second server is more work heavy, the first server is going to hold back longer until the second server is done computing the request, and the wrk2 load generators will try to depend on this, violating the open-loop criteria. 
 
 ## Tail Latency test
 Ground truth: use `tcpdump` to measure the tail latency on the client side. 
@@ -64,7 +64,7 @@ With the server results, to measure the tail latencies, measure the difference b
 
 ### Hypothesis
 
-Many workload generators, particularly wrk2 family workload generators, will fail to record the accurate tail latency due to client side queueing delay. 
+wrk2 family of workload generators will time out due to the requests waiting on the server, and the accurate tail latency will not be determined, even though in reality 
 
 ### Important update
 You can make modifications to main.go and add some line of code that will make some sort of impact on the tail latency. However, the tail latency from the workload generators should match nearly that of what tcpdump returns

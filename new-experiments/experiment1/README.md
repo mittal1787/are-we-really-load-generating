@@ -72,7 +72,7 @@ Many workload generators, particularly wrk2 family workload generators, will fai
 You can make modifications to main.go and add some line of code that will make some sort of impact on the tail latency. However, the tail latency from the workload generators should match nearly that of what tcpdump returns
 
 ## Tests to run
-For wrk2 family workload generators, run the tests for 100 RPS, 200 RPS, 250 RPS, 500 RPS, 1000 RPS, 2000 RPS, 2500 RPS, 5000 RPS, 10000 RPS, 20000 RPS, 25000 RPS, 50000 RPS, 100000 RPS. Run the thread combinations of 1 thread, 2 threads, 4 threads, 8 threads, 10 threads, 12 threads, 16 threads, and 24 threads. Try 10, 20, 25, 50, 100, 200, 500, 1000, and 10000 connections. 
+For wrk2 family workload generators, run the tests for 100 RPS, 200 RPS, 500 RPS, 1000 RPS, 2000 RPS, 5000 RPS, 10000 RPS, 20000 RPS, 50000 RPS, 100000 RPS. Run the thread combinations of 1 thread, 2 threads, 4 threads, 8 threads, 10 threads, 12 threads, 16 threads, and 24 threads. Try 10, 20, 25, 50, 100, 200, 500, 1000, and 10000 connections. 
 
 Repeat similar experiments for other workload generators as well.
 
