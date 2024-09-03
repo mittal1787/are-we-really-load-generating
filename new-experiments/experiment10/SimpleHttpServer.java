@@ -1,5 +1,5 @@
 // Java Program to Set up a Basic HTTP Server
-// https://www.geeksforgeeks.org/how-to-set-up-a-basic-http-server-in-java/
+// Source: https://www.geeksforgeeks.org/how-to-set-up-a-basic-http-server-in-java/
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -23,8 +23,6 @@ public class SimpleHttpServer
         // Start the server
         server.setExecutor(null); // Use the default executor
         server.start();
- 
-        System.out.println("Server is running on port 8000");
     }
  
     // define a custom HttpHandler
@@ -32,8 +30,10 @@ public class SimpleHttpServer
         @Override
         public void handle(HttpExchange exchange) throws IOException 
         {
+            // Print UNIX time in nanoseconds
+            System.out.println(System.nanoTime());
             // handle the request
-            String response = "Simple HTTP response from Java for Experiment 8";
+            String response = "Simple HTTP response from Java for Experiment 10";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());

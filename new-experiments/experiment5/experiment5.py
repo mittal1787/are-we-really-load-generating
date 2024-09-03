@@ -13,10 +13,10 @@ rps_counts = [500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
 
 DATA_DIR = "data-wrk2"
 
-def install_servers(server_one:str, server_two:str):
+def install_servers(user:str, server_one:str, server_two:str):
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
-    ssh_con.connect(server_one, username="yugm2")
+    ssh_con.connect(server_one, username=user)
     stdin, stdout, stderr = ssh_con.exec_command("git clone https://github.com/mittal1787/are-we-really-load-generating.git && cd are-we-really-load-generating && git pull origin main")
     stdin, stdout, stderr = ssh_con.exec_command("cd are-we-really-load-generating/new-experiments/experiment5 && sh install.sh")
     while True:
@@ -45,21 +45,34 @@ def run_server_one(user:str, server_one: str, server_two:str, dir_name:str, barr
     file_to_write = open(f"{dir_name}/server_arrival_times.csv","w")
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
-    ssh_con.connect(server_one, username="yugm2")
+    ssh_con.connect(server_one, username=user)
     ssh_con.exec_command(f"go run are-we-really-load-generating/new-experiments/experiment5/serverone.go {server_two} > timestamp.txt")
     barrier.wait()
     time.sleep(60)
-    print("run_server: Now read lines")
+    ssh_con.close()
+    ssh_con = paramiko.SSHClient()
+    ssh_con.load_system_host_keys()
+    ssh_con.connect(server_one, username=user)
+    stdin, stdout, stderr = ssh_con.exec_command("cat timestamp.txt")
+    file_to_write.write(stdout.read().decode().replace('\x00',''))
+    file_to_write.close()
+    print("Finished running server")
 
 def run_server_two(user:str, server_two:str, dir_name:str, barrier):
     file_to_write = open(f"{dir_name}/server_arrival_times.csv","w")
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
-    ssh_con.connect(server_two, username="yugm2")
+    ssh_con.connect(server_two, username=user)
     ssh_con.exec_command(f"go run are-we-really-load-generating/new-experiments/experiment5/servertwo.go  > timestamp.txt")
     barrier.wait()
     time.sleep(60)
-    print("run_server: Now read lines")
+    ssh_con = paramiko.SSHClient()
+    ssh_con.load_system_host_keys()
+    ssh_con.connect(server_two, username=user)
+    stdin, stdout, stderr = ssh_con.exec_command("cat timestamp.txt")
+    file_to_write.write(stdout.read().decode().replace('\x00',''))
+    file_to_write.close()
+    print("Finished running server")
 
 def run_wrk2(client_hostname:str, server_one_hostname: str, server_two_hostname:str, experiment_name: str, user: str):
     os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}")
@@ -102,9 +115,9 @@ if __name__ == "__main__":
     user = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"c:s:t:g",["client=","server=","loadgen="])
+        opts, args = getopt.getopt(sys.argv[1:],"c:s:t:u:g",["client=","server=","user=","loadgen="])
     except getopt.GetoptError:
-        print('experiment3.py -c <client-hostname> -s <server-hostname> -t <second-server-hostname>')
+        print('experiment5.py -c <client-hostname> -s <server-hostname> -t <second-server-hostname>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-c':
@@ -118,10 +131,10 @@ if __name__ == "__main__":
         elif opt == '-u':
             user = arg
         else:
-            print('experiment4.py -c <client-hostname> -s <server-hostname> -g <load-generator> -u <username>')
+            print('experiment5.py -c <client-hostname> -s <server-hostname> -g <load-generator> -u <username>')
             sys.exit(2)
 
-    install_servers(server_one_hostname, server_two_hostname)
+    install_servers(user, server_one_hostname, server_two_hostname)
     if loadgen == "wrk2":
         experimentutils.install_wrk2(client_hostname, user)
         run_wrk2(client_hostname, server_one_hostname, server_two_hostname, experiment_name="experiment5", user=user)

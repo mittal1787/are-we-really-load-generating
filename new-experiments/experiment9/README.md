@@ -17,3 +17,6 @@ In one cluster, set up Istio. In another cluster, set up Kubernetes.
 In one more machine, run the workload generator. Run the specifications that the papers ran (try to mimic those specifications of the other papers).
 
 ## Setup instructions
+In the server machine, run the kubernetes installation and deploy the Social Network application.
+
+With the wrk2 workload generators, run the workload that was run by the experimenters themselves. From there, run the similar workloads on the other workload generators and verify that the results from the other workload generators match that of the wrk2 family workload generators. If it does not match, this will put the wrk2 family workload generators to question.

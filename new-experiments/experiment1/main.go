@@ -17,8 +17,7 @@ func main() {
 
 	log.Printf("Serving files from '%s'", *wwwDir)
 
-	http.HandleFunc("/hello", handler)
-	http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(*wwwDir))))
+	http.HandleFunc("/", handler)
 
 	log.Printf("Starting HTTP server on port %d", *wwwPort)
 	err := http.ListenAndServe(":"+strconv.Itoa(*wwwPort), nil)

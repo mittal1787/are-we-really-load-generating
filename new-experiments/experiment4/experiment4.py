@@ -48,9 +48,14 @@ if __name__ == "__main__":
     install_server(server_hostname, user)
     if loadgen == "wrk2":
         experimentutils.install_wrk2(client_hostname, user)
-        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment4", user)
+        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment4", "are_we_really_load_generating/new_experiments/experiment4/requests.lua", user)
+    elif loadgen == "wrk2-dsb":
+        experimentutils.install_wrk2_dsb(client_hostname, user)
+        experimentutils.run_wrk2_dsb(client_hostname, server_hostname, "experiment4", "are_we_really_load_generating/new_experiments/experiment4/requests.lua", ssh_user=user)
     else:
         # Run all here
         experimentutils.install_wrk2(client_hostname, user)
-        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment4", user)
+        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment4", "are_we_really_load_generating/new_experiments/experiment4/requests.lua", user)
+        experimentutils.install_wrk2_dsb(client_hostname, user)
+        experimentutils.run_wrk2_dsb(client_hostname, server_hostname, "experiment4", "are_we_really_load_generating/new_experiments/experiment4/requests.lua", ssh_user=user)
     # TODO: Create installation for other load generators
