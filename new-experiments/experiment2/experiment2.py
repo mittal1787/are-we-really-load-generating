@@ -8,7 +8,7 @@ def install_server(server_machine_name:str, username):
     ssh_con.load_system_host_keys()
     ssh_con.connect(server_machine_name, username=username)
     stdin, stdout, stderr = ssh_con.exec_command("git clone https://github.com/mittal1787/are-we-really-load-generating.git && cd are-we-really-load-generating && git pull origin main")
-    stdin, stdout, stderr = ssh_con.exec_command("cd are-we-really-load-generating/new-experiments/experiment1 && sh install.sh")
+    stdin, stdout, stderr = ssh_con.exec_command("cd are-we-really-load-generating/new-experiments/experiment2 && sh install.sh")
     for i in range(4):
         try:
             stdin.write("Y\n")
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(sys.argv[1:],"u:c:s:g",["username=","client=","server=","loadgen="])
     except getopt.GetoptError:
-        print('experiment1.py -c <client-hostname> -s <server-hostname> -g <load-generator> -u <username>')
+        print('experiment2.py -c <client-hostname> -s <server-hostname> -g <load-generator> -u <username>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-c':
@@ -40,18 +40,15 @@ if __name__ == "__main__":
         elif opt == '-u':
             user = arg
         else:
-            print('experiment1.py -c <client-hostname> -s <server-hostname> -g <load-generator> -u <username>')
+            print('experiment2.py -c <client-hostname> -s <server-hostname> -g <load-generator> -u <username>')
             sys.exit(2)
-    if (user == None or client_hostname == None or server_hostname == None):
-        print('experiment1.py -c <client-hostname> -s <server-hostname> -g <load-generator> -u <username>')
-        sys.exit(2)
 
     install_server(server_hostname, user)
     if loadgen == "wrk2":
         experimentutils.install_wrk2(client_hostname, user)
-        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment1", ssh_user=user)
+        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment2", user=user)
     else:
         # Run all here
         experimentutils.install_wrk2(client_hostname, user)
-        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment1", ssh_user=user)
+        experimentutils.run_wrk2(client_hostname, server_hostname, "experiment2", user=user)
     # TODO: Create installation for other load generators

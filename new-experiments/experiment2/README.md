@@ -31,6 +31,15 @@ The file main.go is the server.
 go run main.go > timestamp.txt
 ```
 
+## Even simpler approach
+In your local machine, you can run 
+
+```
+python experiment1.py -c <client-hostname> -s <server-hostname> -u <machine-username>
+```
+
+Note you need to have paramiko installed on your local machine 
+
 ## Throughput test
 
 Run the load generator against the server by supplying the URL to the client machine. After running the server, run the workload generator against the server on the client machine. The timestamps will be printed out in the `timestamp.txt` file of the server machine. 
