@@ -1,4 +1,5 @@
 from datetime import datetime 
+import matplotlib.pyplot as plt
 import time
 import itertools
 import paramiko
