@@ -6,6 +6,7 @@ from ..common import experimentutils
 def install_server(server_machine_name:str, username):
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
+    print("install_server: ", server_machine_name)
     ssh_con.connect(server_machine_name, username=username)
     stdin, stdout, stderr = ssh_con.exec_command("git clone https://github.com/mittal1787/are-we-really-load-generating.git && cd are-we-really-load-generating && git pull origin main")
     stdin, stdout, stderr = ssh_con.exec_command("cd are-we-really-load-generating/new-experiments/experiment2 && sh install.sh")
