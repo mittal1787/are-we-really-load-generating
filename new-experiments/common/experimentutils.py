@@ -90,9 +90,10 @@ def install_wrk2(client_hostname:str, ssh_user:str):
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
     ssh_con.connect(client_hostname, username=ssh_user)
-    ssh_con.exec_command("git clone https://github.com/mittal1787/are-we-really-load-generating.git && cd are-we-really-load-generating && git pull origin main")
-    ssh_con.exec_command("cd are-we-really-load-generating/new-experiments")
-    stdin, stdout, stderr = ssh_con.exec_command("sh install_wrk2.sh")
+    stdin, stdout, stderr =  ssh_con.exec_command("git clone https://github.com/mittal1787/are-we-really-load-generating.git")
+    print("install_wrk2 err: ", str(stderr.read()))
+    stdin, stdout, stderr =  ssh_con.exec_command("cd are-we-really-load-generating && git pull origin main && sh new-experiments/install_wrk2.sh")
+    print("install_wrk2 err: ", str(stderr.read()))
     try:
         stdin.write("Y\n")
         stdin.flush()
