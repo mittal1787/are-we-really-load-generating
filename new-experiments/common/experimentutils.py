@@ -16,6 +16,21 @@ rps_counts = [500, 1000, 5000, 10000, 50000, 100000]
 DATA_DIR_WRK2_DSB = "data-wrk2-dsb-multimachine"
 DATA_DIR = "data-wrk2"
 
+def create_latency_histogram(timestamp_file:str, file_to_save:str):
+    with open(timestamp_file, "r", encoding="utf-8") as f:
+        log = f.read()
+
+    arrival_times = []
+
+    for line in log.split("\n"):
+        if len(line) > 0:
+            arrival_times.append(float(line))
+
+    plt.hist(arrival_times,bins=60)
+    plt.ylabel("Count")
+    plt.xlabel("Arrival time")
+    plt.savefig(file_to_save)
+
 def parse_tcpdumps_file(file_name:str, client_hostname:str):
     latencies = []
     with open(file_name) as file:
@@ -91,6 +106,7 @@ def run_wrk2_on_client_machine(ssh_user:str, client_machine_name:str, server_mac
     print("Finished reading wrk2 on client machine")
 
 def read_client_tcpdump(ssh_user:str, client_hostname:str, server_machine_name: str, dir_name:str, barrier):
+    print("read_client_tcpdump")
     cmd = "cd are-we-really-load-generating/new-experiments/common && python3 tcpdumpreader.py " + server_machine_name
     file_to_write = open(f"{dir_name}/client_tcpdump.csv","w")
     ssh_con = paramiko.SSHClient()
@@ -106,7 +122,8 @@ def read_client_tcpdump(ssh_user:str, client_hostname:str, server_machine_name: 
     print("Finished reading tcpdump")
 
 def run_server(ssh_user:str, client_hostname:str, server_machine_name: str, thread_count: int, conn_count: int, rps:int, experiment_name:str, barrier):
-    file_to_write = open(f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}/t{thread_count}-c{conn_count}-rps{rps}/server_arrival_times.csv","w")
+    filename = f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}/t{thread_count}-c{conn_count}-rps{rps}/server_arrival_times.csv"
+    file_to_write = open(filename,"w")
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
     ssh_con.connect(server_machine_name, username=ssh_user)
@@ -120,6 +137,7 @@ def run_server(ssh_user:str, client_hostname:str, server_machine_name: str, thre
     stdin, stdout, stderr = ssh_con.exec_command("cat timestamp.txt")
     file_to_write.write(stdout.read().decode().replace('\x00',''))
     file_to_write.close()
+    create_latency_histogram(filename,  f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}/t{thread_count}-c{conn_count}-rps{rps}/server_arrival_times.png")
     print("Finished running server")
 
 def install_wrk2(client_hostname:str, ssh_user:str):
