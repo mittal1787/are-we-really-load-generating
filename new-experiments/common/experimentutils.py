@@ -3,6 +3,8 @@ import itertools
 import paramiko
 import threading
 import os
+import tcpdumpanalysis
+import json
 
 conn_counts = [10, 20, 25, 50, 100, 200, 500, 1000, 10000]
 thread_counts = [1, 2, 4, 8, 10, 12, 16, 24]
@@ -52,6 +54,7 @@ def run_wrk2_on_client_machine(ssh_user:str, client_machine_name:str, server_mac
     ssh_con.connect(client_machine_name, username=ssh_user)
     barrier.wait()
     stdin, stdout, stderr = ssh_con.exec_command(cmd)
+    print("run_wrk2_on_client_machine: ", stderr.read().decode("utf-8"))
     file_to_write.write(stdout.read().decode("utf-8"))
     file_to_write.close()
     print("Finished reading wrk2 on client machine")
@@ -67,6 +70,8 @@ def read_client_tcpdump(ssh_user:str, client_hostname:str, server_machine_name: 
     client_data = stdout.read().decode("utf-8")
     file_to_write.write(client_data)
     file_to_write.close()
+    with open(f"{dir_name}/client_tcpdump_results.json","w") as f:
+        f.write(json.dumps(tcpdumpanalysis(f"{dir_name}/client_tcpdump.csv", client_hostname)))
     print("Finished reading tcpdump")
 
 def run_server(ssh_user:str, client_hostname:str, server_machine_name: str, thread_count: int, conn_count: int, rps:int, experiment_name:str, barrier):

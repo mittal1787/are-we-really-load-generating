@@ -35,10 +35,12 @@ go run main.go > timestamp.txt
 In your local machine, you can run 
 
 ```
-python experiment1.py -c <client-hostname> -s <server-hostname> -u <machine-username>
+python -m new-experiments.experiment1.experiment1.py -c <client-hostname> -s <server-hostname> -u <machine-username>
 ```
 
-Note you need to have paramiko installed on your local machine 
+from the `are-we-really-load-generating` directory.
+
+Note you need to have paramiko installed on your local machine. You can install via `pip install paramiko`.
 
 ## Throughput test
 
