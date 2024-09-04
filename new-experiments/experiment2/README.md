@@ -40,7 +40,15 @@ python -m new-experiments.experiment2.experiment2.py -c <client-hostname> -s <se
 
 from the `are-we-really-load-generating` directory.
 
-Note you need to have paramiko installed on your local machine. You can install via `pip install paramiko`.
+Note you need to have paramiko installed on your local machine. You can install via `pip install paramiko`. Same with numpy and matplotlib
+
+You can also run
+
+```
+sh run_experiment2.sh -c <client-hostname> -s <server-hostname> -u <machine-username>
+```
+from this directory.
+
 
 ## Throughput test
 
