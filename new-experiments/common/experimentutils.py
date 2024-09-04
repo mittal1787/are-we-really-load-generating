@@ -59,7 +59,7 @@ def parse_tcpdumps_file(file_name:str, client_hostname:str):
                                 break
                         j += 1
             lines.remove(line)
-    return {"latencies": latencies, "percentiles": np.percentile(latencies, [50,75,90,99,99.9,99.99,99.999,100])}
+    return {"latencies": latencies, "percentiles": np.percentile(latencies, [50,75,90,99,99.9,99.99,99.999,100]).tolist()}
 
 def read_wrk_cpu_utilization(ssh_user:str, machine_name:str, dir_name:str, barrier):
     file_to_write = open(f"{dir_name}/wrk2-cpu-util.csv","w")
