@@ -90,9 +90,9 @@ def read_server_cpu_utilization(ssh_user, dir_name, server_machine_name:str, ser
     file_to_write.close()
     print("Server CPU utilization done reading")
 
-def run_wrk2_on_client_machine(ssh_user:str, client_machine_name:str, server_machine_name:str, thread_count: int, conn_count: int, machine_rps:int, experiment_name:str, lua_script_path, dir_name, barrier):
+def run_wrk2_on_client_machine(ssh_user:str, client_machine_name:str, server_machine_name:str, thread_count: int, conn_count: int, machine_rps:int, experiment_name:str, port:str, lua_script_path, dir_name, barrier):
     wrk = "are-we-really-load-generating/new-experiments/wrk2/wrk"
-    cmd = f"{wrk} -t{thread_count} -c{conn_count} -d60s -R{machine_rps} --latency http://" + server_machine_name + ":8000"
+    cmd = f"{wrk} -t{thread_count} -c{conn_count} -d60s -R{machine_rps} --latency http://" + server_machine_name + ":" + port
     if lua_script_path != None:
         cmd += " --script " + lua_script_path
     file_to_write = open(f"{dir_name}/wrk2_results.csv","w")
@@ -155,7 +155,7 @@ def install_wrk2(client_hostname:str, ssh_user:str):
     except OSError:
         pass
 
-def run_wrk2(client_hostname:str, server_machine_name: str, experiment_name: str, lua_script_path: str = None, ssh_user: str = None):
+def run_wrk2(client_hostname:str, server_machine_name: str, experiment_name: str, lua_script_path: str = None, ssh_user: str = None, port:str = "8000"):
     os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}", exist_ok=True)
     os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}", exist_ok=True)
     configs = itertools.product(conn_counts, thread_counts)
@@ -170,7 +170,7 @@ def run_wrk2(client_hostname:str, server_machine_name: str, experiment_name: str
                 py_threads.append(threading.Thread(target=run_server, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, experiment_name, barrier)))
                 py_threads.append(threading.Thread(target=read_wrk_cpu_utilization, args=(ssh_user, client_hostname, dir_name, barrier)))
                 py_threads.append(threading.Thread(target=read_server_cpu_utilization, args=(ssh_user, dir_name, server_machine_name, "main", barrier)))
-                py_threads.append(threading.Thread(target=run_wrk2_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, experiment_name, lua_script_path, dir_name, barrier)))
+                py_threads.append(threading.Thread(target=run_wrk2_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, experiment_name, port, lua_script_path, dir_name, barrier)))
                 py_threads.append(threading.Thread(target=read_client_tcpdump, args=(ssh_user, client_hostname, server_machine_name, dir_name, barrier)))
 
                 for py_thread in py_threads:
@@ -206,9 +206,9 @@ def install_wrk2_dsb(client_hostname:str, ssh_user:str):
     except OSError:
         pass
 
-def run_wrk2_dsb_on_client_machine(ssh_user:str, client_machine_name:str, server_machine_name:str, thread_count: int, conn_count: int, machine_rps:int, distribution_type:str, lua_script_path, dir_name, barrier):
+def run_wrk2_dsb_on_client_machine(ssh_user:str, client_machine_name:str, server_machine_name:str, thread_count: int, conn_count: int, machine_rps:int, distribution_type:str, port:str, lua_script_path, dir_name, barrier):
     wrk = "are-we-really-load-generating/new-experiments/DeathStarBench/wrk2/wrk"
-    cmd = f"{wrk} -t{thread_count} -c{conn_count} -d60s -R{machine_rps} -D {distribution_type} --latency http://" + server_machine_name + ":8000"
+    cmd = f"{wrk} -t{thread_count} -c{conn_count} -d60s -R{machine_rps} -D {distribution_type} --latency http://" + server_machine_name + ":" + port
     if lua_script_path != None:
         cmd += " --script " + lua_script_path
     file_to_write = open(f"{dir_name}/wrk2_results.csv","w")
@@ -221,7 +221,7 @@ def run_wrk2_dsb_on_client_machine(ssh_user:str, client_machine_name:str, server
     file_to_write.close()
     print("Finished reading wrk2 on client machine")
 
-def run_wrk2_dsb(client_hostname:str, server_machine_name: str, experiment_name: str, lua_script_path: str = None, ssh_user: str = None):
+def run_wrk2_dsb(client_hostname:str, server_machine_name: str, experiment_name: str, lua_script_path: str = None, ssh_user: str = None, port:str = "8000"):
     os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR_WRK2_DSB}", exist_ok=True)
     os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR_WRK2_DSB}/client={client_hostname}-server={server_machine_name}", exist_ok=True)
     configs = itertools.product(conn_counts, thread_counts)
@@ -237,7 +237,7 @@ def run_wrk2_dsb(client_hostname:str, server_machine_name: str, experiment_name:
                     py_threads.append(threading.Thread(target=run_server, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, experiment_name, barrier)))
                     py_threads.append(threading.Thread(target=read_wrk_cpu_utilization, args=(ssh_user, client_hostname, dir_name, barrier)))
                     py_threads.append(threading.Thread(target=read_server_cpu_utilization, args=(ssh_user, dir_name, server_machine_name, "main", barrier)))
-                    py_threads.append(threading.Thread(target=run_wrk2_dsb_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, distr, experiment_name, lua_script_path, dir_name, barrier)))
+                    py_threads.append(threading.Thread(target=run_wrk2_dsb_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, distr, port, experiment_name, lua_script_path, dir_name, barrier)))
                     py_threads.append(threading.Thread(target=read_client_tcpdump, args=(ssh_user, client_hostname, server_machine_name, dir_name, barrier)))
 
                     for py_thread in py_threads:
