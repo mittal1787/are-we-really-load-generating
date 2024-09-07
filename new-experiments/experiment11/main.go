@@ -29,9 +29,9 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now().UnixNano())
-	duration, err = strconv.Atoi(os.Args[1])
+	duration, err = strconv.ParseDuration(os.Args[1])
 	if err == nil {
-		time.Sleep(duration * time.Second)
+		time.Sleep(duration)
 	}
 	fmt.Fprint(w, "Hello !")
 }
