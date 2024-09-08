@@ -34,7 +34,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf(os.Stderr, os.Args[1])
 		time.Sleep(duration)
 	} else {
-		fmt.Fprintf(os.Stderr, err)
+		println(err.Error())
 	}
 	fmt.Fprint(w, "Hello !")
 }
