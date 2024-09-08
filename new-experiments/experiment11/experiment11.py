@@ -57,9 +57,7 @@ def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str
                 if conn >= thread:
                     print(f"RPS = {rps}, Connections = {conn}, Thread = {thread}")
                     dir_name = f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_one_hostname}/t{thread}-c{conn}-rps{rps}-{duration}"
-                    client_to_s1_packets = f"{dir_name}/{client_hostname}-to-{server_one_hostname}-packets"
                     os.makedirs(dir_name, exist_ok=True)
-                    os.makedirs(client_to_s1_packets, exist_ok=True)
                     barrier = threading.Barrier(6)
                     py_threads = []
                     py_threads.append(threading.Thread(target=run_server, args=(user, server_one_hostname, duration, dir_name, barrier)))
