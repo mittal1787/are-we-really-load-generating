@@ -1,0 +1,125 @@
+Running 1m test @ http://amd261.utah.cloudlab.us:8000
+  24 threads and 500 connections
+  Thread calibration: mean lat.: 30.259ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 16.514ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 1.452ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 23.780ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 22.829ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 3.031ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 23.773ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 22.801ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 2.657ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 23.653ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 30.618ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 22.649ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 1.457ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 23.449ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 30.595ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 16.662ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 36.720ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 30.506ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 16.476ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 30.540ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 23.472ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 30.561ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 16.427ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 22.834ms, rate sampling interval: 10ms
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.26ms  661.18us   5.40ms   70.92%
+    Req/Sec    22.04    124.71     2.22k    96.03%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%    1.16ms
+ 75.000%    1.63ms
+ 90.000%    2.13ms
+ 99.000%    3.20ms
+ 99.900%    4.86ms
+ 99.990%    5.24ms
+ 99.999%    5.41ms
+100.000%    5.41ms
+
+  Detailed Percentile spectrum:
+       Value   Percentile   TotalCount 1/(1-Percentile)
+
+       0.087     0.000000            1         1.00
+       0.504     0.100000         2500         1.11
+       0.705     0.200000         4992         1.25
+       0.865     0.300000         7490         1.43
+       1.011     0.400000         9987         1.67
+       1.157     0.500000        12483         2.00
+       1.238     0.550000        13732         2.22
+       1.329     0.600000        14987         2.50
+       1.425     0.650000        16225         2.86
+       1.528     0.700000        17481         3.33
+       1.633     0.750000        18726         4.00
+       1.694     0.775000        19355         4.44
+       1.752     0.800000        19968         5.00
+       1.823     0.825000        20594         5.71
+       1.906     0.850000        21219         6.67
+       2.005     0.875000        21844         8.00
+       2.063     0.887500        22164         8.89
+       2.129     0.900000        22465        10.00
+       2.197     0.912500        22780        11.43
+       2.273     0.925000        23091        13.33
+       2.365     0.937500        23405        16.00
+       2.417     0.943750        23556        17.78
+       2.475     0.950000        23715        20.00
+       2.537     0.956250        23869        22.86
+       2.613     0.962500        24024        26.67
+       2.699     0.968750        24180        32.00
+       2.753     0.971875        24258        35.56
+       2.807     0.975000        24338        40.00
+       2.867     0.978125        24414        45.71
+       2.935     0.981250        24493        53.33
+       3.017     0.984375        24571        64.00
+       3.063     0.985938        24609        71.11
+       3.115     0.987500        24648        80.00
+       3.167     0.989062        24688        91.43
+       3.245     0.990625        24726       106.67
+       3.347     0.992188        24765       128.00
+       3.423     0.992969        24785       142.22
+       3.465     0.993750        24804       160.00
+       3.549     0.994531        24824       182.86
+       3.663     0.995313        24843       213.33
+       3.893     0.996094        24863       256.00
+       3.989     0.996484        24873       284.44
+       4.115     0.996875        24882       320.00
+       4.215     0.997266        24892       365.71
+       4.327     0.997656        24902       426.67
+       4.479     0.998047        24912       512.00
+       4.535     0.998242        24918       568.89
+       4.563     0.998437        24921       640.00
+       4.667     0.998633        24926       731.43
+       4.763     0.998828        24931       853.33
+       4.875     0.999023        24936      1024.00
+       4.919     0.999121        24939      1137.78
+       4.935     0.999219        24941      1280.00
+       4.963     0.999316        24943      1462.86
+       4.987     0.999414        24946      1706.67
+       5.007     0.999512        24948      2048.00
+       5.087     0.999561        24950      2275.56
+       5.099     0.999609        24952      2560.00
+       5.099     0.999658        24952      2925.71
+       5.119     0.999707        24953      3413.33
+       5.155     0.999756        24954      4096.00
+       5.171     0.999780        24955      4551.11
+       5.219     0.999805        24956      5120.00
+       5.219     0.999829        24956      5851.43
+       5.235     0.999854        24957      6826.67
+       5.235     0.999878        24957      8192.00
+       5.243     0.999890        24958      9102.22
+       5.243     0.999902        24958     10240.00
+       5.243     0.999915        24958     11702.86
+       5.395     0.999927        24959     13653.33
+       5.395     0.999939        24959     16384.00
+       5.395     0.999945        24959     18204.44
+       5.395     0.999951        24959     20480.00
+       5.395     0.999957        24959     23405.71
+       5.407     0.999963        24960     27306.67
+       5.407     1.000000        24960          inf
+#[Mean    =        1.263, StdDeviation   =        0.661]
+#[Max     =        5.404, Total count    =        24960]
+#[Buckets =           27, SubBuckets     =         2048]
+----------------------------------------------------------
+  30200 requests in 1.00m, 3.54MB read
+Requests/sec:    502.45
+Transfer/sec:     60.35KB

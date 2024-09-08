@@ -31,11 +31,12 @@ def install_servers(user:str, server_name:str):
     ssh_con.load_system_host_keys()
 
 def run_server(user:str, server_one: str, duration:str, dir_name:str, barrier):
-    file_to_write = open(f"{dir_name}/server_arrival_times.csv","w")
+    filename = f"{dir_name}/server_arrival_times.csv"
+    file_to_write = open(filename,"w")
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
     ssh_con.connect(server_one, username=user)
-    ssh_con.exec_command(f"go run are-we-really-load-generating/new-experiments/experiment11/main.go {duration} > timestamp.txt")
+    stdin, stdout, stderr = ssh_con.exec_command(f"go run are-we-really-load-generating/new-experiments/experiment11/main.go {duration} > timestamp.txt")
     barrier.wait()
     time.sleep(60)
     ssh_con.close()
@@ -45,6 +46,7 @@ def run_server(user:str, server_one: str, duration:str, dir_name:str, barrier):
     stdin, stdout, stderr = ssh_con.exec_command("cat timestamp.txt")
     file_to_write.write(stdout.read().decode().replace('\x00',''))
     file_to_write.close()
+    experimentutils.create_latency_histogram(filename,  f"{dir_name}/server_arrival_times.png")
     print("Finished running server")
 
 def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str, user: str):
@@ -55,7 +57,7 @@ def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str
         for i, (conn, thread) in enumerate(configs):
             for duration in ['1s','5s','10s','30s','45s','1m','1m30s','2m']:
                 if conn >= thread:
-                    print(f"RPS = {rps}, Connections = {conn}, Thread = {thread}")
+                    print(f"RPS = {rps}, Connections = {conn}, Thread = {thread}, duration = {duration}")
                     dir_name = f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_one_hostname}/t{thread}-c{conn}-rps{rps}-{duration}"
                     os.makedirs(dir_name, exist_ok=True)
                     barrier = threading.Barrier(6)
@@ -84,7 +86,7 @@ def run_wrk2_dsb(client_hostname:str, server_one_hostname: str, experiment_name:
             for duration in ['1s','5s','10s','30s','45s','1m','1m30s','2m']:
                 if conn >= thread:
                     for distr in ["fixed","exp","zipf","norm"]:
-                        print(f"RPS = {rps}, Connections = {conn}, Thread = {thread}")
+                        print(f"RPS = {rps}, Connections = {conn}, Thread = {thread}, Distribution = {disr}, Duration = {duration}")
                         dir_name = f"new-experiments/{experiment_name}/{DATA_DIR_DSB}/client={client_hostname}-server_one={server_one_hostname}-server_two={server_two_hostname}/t{thread}-c{conn}-rps{rps}-{duration}-"
                         client_to_s1_packets = f"{dir_name}/{client_hostname}-to-{server_one_hostname}-packets"
                         s1_to_s2_packets = f"{dir_name}/{server_one_hostname}-to-{server_two_hostname}-packets"

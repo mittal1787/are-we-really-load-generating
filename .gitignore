@@ -2,3 +2,5 @@
 new-experiments/wrk2
 new-experiments/DeathStarBench
 new-experiments/DeathStarBench/*
+new-experiments/common/__pycache__/*
+*.pyc

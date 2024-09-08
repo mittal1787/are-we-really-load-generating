@@ -31,7 +31,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now().UnixNano())
 	duration, err := time.ParseDuration(os.Args[1])
 	if err == nil {
+		fmt.Printf(os.Stderr, os.Args[1])
 		time.Sleep(duration)
+	} else {
+		fmt.Printf(os.Stderr, err)
 	}
 	fmt.Fprint(w, "Hello !")
 }

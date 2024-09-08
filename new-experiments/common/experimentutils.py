@@ -27,6 +27,7 @@ def create_latency_histogram(timestamp_file:str, file_to_save:str):
         if len(line) > 0:
             arrival_times.append(float(line))
 
+    plt.clf()
     plt.hist(arrival_times,bins=60)
     plt.ylabel("Count")
     plt.xlabel("Arrival time")
