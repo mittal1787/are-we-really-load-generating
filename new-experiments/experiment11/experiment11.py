@@ -77,8 +77,8 @@ def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str
                     time.sleep(5) 
 
 def run_wrk2_dsb(client_hostname:str, server_one_hostname: str, experiment_name: str, user: str):
-    os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}")
-    os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server_one={server_one_hostname}-server_two={server_two_hostname}", exist_ok=True)
+    os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR_DSB}", exist_ok=True)
+    os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR_DSB}/client={client_hostname}-server_one={server_one_hostname}-server_two={server_two_hostname}", exist_ok=True)
     configs = itertools.product(conn_counts, thread_counts)
     for rps in rps_counts:
         for i, (conn, thread) in enumerate(configs):
