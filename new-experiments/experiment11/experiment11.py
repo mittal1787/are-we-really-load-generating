@@ -39,6 +39,7 @@ def run_server(user:str, server_one: str, duration:str, dir_name:str, barrier):
     stdin, stdout, stderr = ssh_con.exec_command(f"go run are-we-really-load-generating/new-experiments/experiment11/main.go {duration} > timestamp.txt")
     barrier.wait()
     time.sleep(60)
+    print("run_server:", stderr.read().decode())
     ssh_con.close()
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
