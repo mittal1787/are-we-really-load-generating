@@ -70,6 +70,7 @@ def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str
 
                     for py_thread in py_threads:
                         py_thread.start()
+                    time.sleep(1000)
                     # Signal the threads to begin
                     barrier.wait()
                     for py_thread in py_threads:
