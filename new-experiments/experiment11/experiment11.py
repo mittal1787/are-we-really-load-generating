@@ -48,7 +48,7 @@ def run_server(user:str, server_one: str, duration:str, dir_name:str, barrier):
     print("Finished running server")
 
 def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str, user: str):
-    os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}")
+    os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}", exist_ok=True)
     os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server_one={server_one_hostname}-server_two={server_two_hostname}", exist_ok=True)
     configs = itertools.product(conn_counts, thread_counts)
     for rps in rps_counts:
