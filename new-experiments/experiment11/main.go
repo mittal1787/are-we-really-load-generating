@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"os"
+	"bufio"
 )
 
 var file, _ = os.OpenFile("machine.i.log", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
