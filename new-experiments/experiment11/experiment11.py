@@ -1,6 +1,7 @@
 import getopt
 import itertools
 import os
+import re
 import sys
 import threading
 import paramiko
@@ -36,7 +37,14 @@ def run_server(user:str, server_one: str, duration:str, dir_name:str, barrier):
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
     ssh_con.connect(server_one, username=user)
+    stdin, stdout, stderr = ssh_con.exec_command("sudo lsof -i -P -n | grep 8001")
+    str_data = re.sub(' +', ' ',stdout.read().decode())
+    print("run_server:", str_data)
+    if len(str_data) > 0:
+        stdin, stdout, stderr = ssh_con.exec_command(f"kill {int(str_data.split()[1])}")
     stdin, stdout, stderr = ssh_con.exec_command(f"go run are-we-really-load-generating/new-experiments/experiment11/main.go {duration} > timestamp.txt")
+    time.sleep(1)
+    print("run_server: begin barrier wait")
     barrier.wait()
     time.sleep(60)
     ssh_con.close()
@@ -55,7 +63,7 @@ def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str
     configs = itertools.product(conn_counts, thread_counts)
     for rps in rps_counts:
         for i, (conn, thread) in enumerate(configs):
-            for duration in ['1s','5s','10s','30s','45s','1m','1m30s','2m']:
+            for duration in ['1s','5s','10s','30s','45s','1m']:
                 if conn >= thread:
                     print(f"RPS = {rps}, Connections = {conn}, Thread = {thread}, duration = {duration}")
                     dir_name = f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_one_hostname}/t{thread}-c{conn}-rps{rps}-{duration}"
@@ -83,7 +91,7 @@ def run_wrk2_dsb(client_hostname:str, server_one_hostname: str, experiment_name:
     configs = itertools.product(conn_counts, thread_counts)
     for rps in rps_counts:
         for i, (conn, thread) in enumerate(configs):
-            for duration in ['1s','5s','10s','30s','45s','1m','1m30s','2m']:
+            for duration in ['1s','5s','10s','30s','45s','1m']:
                 if conn >= thread:
                     for distr in ["fixed","exp","zipf","norm"]:
                         print(f"RPS = {rps}, Connections = {conn}, Thread = {thread}, Distribution = {disr}, Duration = {duration}")
@@ -93,7 +101,7 @@ def run_wrk2_dsb(client_hostname:str, server_one_hostname: str, experiment_name:
                         os.makedirs(dir_name, exist_ok=True)
                         os.makedirs(client_to_s1_packets, exist_ok=True)
                         os.makedirs(s1_to_s2_packets, exist_ok=True)
-                        barrier = threading.Barrier(8)
+                        barrier = threading.Barrier(6)
                         py_threads = []
                         py_threads.append(threading.Thread(target=run_server, args=(user, server_one_hostname, duration, dir_name, barrier)))
                         py_threads.append(threading.Thread(target=experimentutils.read_wrk_cpu_utilization, args=(user, client_hostname, dir_name, barrier)))
