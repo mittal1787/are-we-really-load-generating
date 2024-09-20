@@ -10,7 +10,7 @@ from ..common import experimentutils
 
 conn_counts = [10, 20, 25, 50, 100, 200, 500, 1000, 2000]
 thread_counts = [1, 2, 4, 8, 10, 12, 16, 24]
-rps_counts = [500, 1000, 2000, 5000, 10000]
+rps_counts = [1000, 2000, 5000, 10000]
 
 DATA_DIR = "data-wrk2"
 DATA_DIR_DSB = "data-wrk2-dsb"
@@ -82,9 +82,7 @@ def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str
                     # Signal the threads to begin
                     barrier.wait()
                     for py_thread in py_threads:
-                        py_thread.join(120)
-                        if py_thread.is_alive():
-                            py_thread.stop()
+                        py_thread.join()
                     time.sleep(5) 
 
 def run_wrk2_dsb(client_hostname:str, server_one_hostname: str, experiment_name: str, user: str):

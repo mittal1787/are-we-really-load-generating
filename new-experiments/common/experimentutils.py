@@ -81,6 +81,7 @@ def read_wrk_cpu_utilization(ssh_user:str, machine_name:str, dir_name:str, barri
         # print(stderr.read())
         time.sleep(1)
     file_to_write.close()
+    ssh_con.close()
     print("wrk2 CPU utilization done")
 
 def read_server_cpu_utilization(ssh_user, dir_name, server_machine_name:str, server_app:str, barrier):
@@ -95,6 +96,7 @@ def read_server_cpu_utilization(ssh_user, dir_name, server_machine_name:str, ser
         file_to_write.write(stdout.read().decode("utf-8"))
         time.sleep(1)
     file_to_write.close()
+    ssh_con.close()
     print("Server CPU utilization done reading")
 
 def run_wrk2_on_client_machine(ssh_user:str, client_machine_name:str, server_machine_name:str, thread_count: int, conn_count: int, machine_rps:int, experiment_name:str, port:str, lua_script_path, dir_name, barrier):
@@ -113,6 +115,7 @@ def run_wrk2_on_client_machine(ssh_user:str, client_machine_name:str, server_mac
     file_to_write.write(stdout.read().decode("utf-8"))
     file_to_write.close()
     print("Finished reading wrk2 on client machine")
+    ssh_con.close()
 
 def read_client_tcpdump(ssh_user:str, client_hostname:str, server_machine_name: str, dir_name:str, barrier):
     print("read_client_tcpdump")
@@ -130,7 +133,8 @@ def read_client_tcpdump(ssh_user:str, client_hostname:str, server_machine_name: 
     file_to_write.close()
     with open(f"{dir_name}/client_tcpdump_results.json","w") as f:
         f.write(json.dumps(parse_tcpdumps_file(f"{dir_name}/client_tcpdump.csv", client_hostname)))
-    print("Finished reading tcpdump")
+    print("read_client_tcpdump: Finished reading tcpdump")
+    ssh_con.close()
 
 def run_server(ssh_user:str, client_hostname:str, server_machine_name: str, thread_count: int, conn_count: int, rps:int, experiment_name:str, barrier):
     filename = f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}/t{thread_count}-c{conn_count}-rps{rps}/server_arrival_times.csv"
@@ -150,6 +154,7 @@ def run_server(ssh_user:str, client_hostname:str, server_machine_name: str, thre
     file_to_write.close()
     create_latency_histogram(filename,  f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}/t{thread_count}-c{conn_count}-rps{rps}/server_arrival_times.png")
     print("Finished running server")
+    ssh_con.close()
 
 def install_wrk2(client_hostname:str, ssh_user:str):
     ssh_con = paramiko.SSHClient()
@@ -164,6 +169,7 @@ def install_wrk2(client_hostname:str, ssh_user:str):
         stdin.flush()
     except OSError:
         pass
+    ssh_con.close()
 
 def run_wrk2(client_hostname:str, server_machine_name: str, experiment_name: str, lua_script_path: str = None, ssh_user: str = None, port:str = "8000"):
     os.makedirs(f"new-experiments/{experiment_name}/{DATA_DIR}", exist_ok=True)
@@ -202,6 +208,7 @@ def install_wrk2_dsb(client_hostname:str, ssh_user:str):
         stdin.flush()
     except OSError:
         pass
+    ssh_con.close()
 
 def install_wrk2_dsb(client_hostname:str, ssh_user:str):
     ssh_con = paramiko.SSHClient()
@@ -214,6 +221,7 @@ def install_wrk2_dsb(client_hostname:str, ssh_user:str):
         stdin.flush()
     except OSError:
         pass
+    ssh_con.close()
 
 def run_wrk2_dsb_on_client_machine(ssh_user:str, client_machine_name:str, server_machine_name:str, thread_count: int, conn_count: int, machine_rps:int, distribution_type:str, port:str, lua_script_path, dir_name, barrier):
     wrk = "are-we-really-load-generating/new-experiments/DeathStarBench/wrk2/wrk"
@@ -228,6 +236,7 @@ def run_wrk2_dsb_on_client_machine(ssh_user:str, client_machine_name:str, server
     stdin, stdout, stderr = ssh_con.exec_command(cmd)
     file_to_write.write(stdout.read().decode("utf-8"))
     file_to_write.close()
+    ssh_con.close()
     print("Finished reading wrk2 on client machine")
 
 def run_wrk2_dsb(client_hostname:str, server_machine_name: str, experiment_name: str, lua_script_path: str = None, ssh_user: str = None, port:str = "8000"):
@@ -254,8 +263,61 @@ def run_wrk2_dsb(client_hostname:str, server_machine_name: str, experiment_name:
                     # Signal the threads to begin
                     barrier.wait()
                     for py_thread in py_threads:
-                        py_thread.join(120)
-                        if py_thread.is_alive():
-                            py_thread.stop()
+                        py_thread.join()
                             
                     time.sleep(5) 
+
+def install_k6(client_hostname:str, ssh_user:str):
+    ssh_con = paramiko.SSHClient()
+    ssh_con.load_system_host_keys()
+    ssh_con.connect(client_hostname, username=ssh_user)
+    ssh_con.exec_command("git clone https://github.com/mittal1787/are-we-really-load-generating.git && cd are-we-really-load-generating && git pull origin main")
+    stdin, stdout, stderr = ssh_con.exec_command("cd are-we-really-load-generating/new-experiments && sh install_k6.sh")
+    try:
+        stdin.write("Y\n")
+        stdin.flush()
+    except OSError:
+        pass
+    ssh_con.close()
+
+def create_k6_constant_arrival_script_file(vus:int, server_hostname:str, port:str):
+    return """
+    import http from 'k6/http';
+    
+    export const options = {
+        scenarios: {
+            open_model: {
+            executor: 'constant-arrival-rate',
+            rate:""" + str(vus) + """,
+            timeUnit: '1s',
+            duration: '1m',
+            preAllocatedVUs:""" + str(vus) + """ ,
+            },
+        },
+    };
+
+    export default function() {
+        http.get('http://""" + server_hostname + ":" + port +  """');
+    }
+    """
+
+def create_k6_ramping_arrival_script_file(vus:int, server_hostname:str, port:str):
+    """
+    import http from 'k6/http';
+    
+    export const options = {
+        scenarios: {
+            open_model: {
+            executor: 'ramping-arrival-rate',
+            rate:""" + str(vus) + """,
+            timeUnit: '1s',
+            duration: '1m',
+            preAllocatedVUs:""" + str(vus) + """ ,
+            },
+        },
+    };
+
+    export default function() {
+        http.get('http://""" + server_hostname + ":" + port +  """');
+    }
+    """
