@@ -8,7 +8,7 @@ import paramiko
 import time
 from ..common import experimentutils
 
-conn_counts = [10, 20, 25, 50, 100, 200, 500]
+conn_counts = [10, 20, 25, 50, 100, 200, 500, 1000, 2000]
 thread_counts = [1, 2, 4, 8, 10, 12, 16, 24]
 rps_counts = [500, 1000, 2000, 5000, 10000]
 
@@ -37,7 +37,7 @@ def run_server(user:str, server_one: str, duration:str, dir_name:str, barrier):
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
     ssh_con.connect(server_one, username=user)
-    stdin, stdout, stderr = ssh_con.exec_command("sudo lsof -i -P -n | grep 8001")
+    stdin, stdout, stderr = ssh_con.exec_command("sudo lsof -i -P -n | grep *:8001")
     str_data = re.sub(' +', ' ',stdout.read().decode())
     print("run_server:", str_data)
     if len(str_data) > 0:
@@ -82,7 +82,9 @@ def run_wrk2(client_hostname:str, server_one_hostname: str, experiment_name: str
                     # Signal the threads to begin
                     barrier.wait()
                     for py_thread in py_threads:
-                        py_thread.join()
+                        py_thread.join(120)
+                        if py_thread.is_alive():
+                            py_thread.stop()
                     time.sleep(5) 
 
 def run_wrk2_dsb(client_hostname:str, server_one_hostname: str, experiment_name: str, user: str):
@@ -113,8 +115,12 @@ def run_wrk2_dsb(client_hostname:str, server_one_hostname: str, experiment_name:
                             py_thread.start()
                         # Signal the threads to begin
                         barrier.wait()
+                        
                         for py_thread in py_threads:
-                            py_thread.join()
+                            py_thread.join(120)
+                            if py_thread.is_alive():
+                                py_thread.stop()
+
                         time.sleep(5) 
 
 if __name__ == "__main__":
@@ -127,7 +133,7 @@ if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(sys.argv[1:],"c:s:u:g",["client=","server=","user=","loadgen="])
     except getopt.GetoptError:
-        print('experiment5.py -c <client-hostname> -s <server-hostname>')
+        print('experiment11.py -c <client-hostname> -s <server-hostname>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-c':

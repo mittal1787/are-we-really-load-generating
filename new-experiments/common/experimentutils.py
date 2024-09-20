@@ -122,9 +122,8 @@ def read_client_tcpdump(ssh_user:str, client_hostname:str, server_machine_name: 
     ssh_con.load_system_host_keys()
     ssh_con.connect(client_hostname, username=ssh_user)
     barrier.wait()
-    stdin, stdout, stderr = ssh_con.exec_command(cmd)
+    stdin, stdout, stderr = ssh_con.exec_command(cmd, timeout=120)
     while True:
-        print("read_client_tcpdump: reading line")
         file_to_write.write(stdout.readline())
         if stdout.channel.exit_status_ready():
             break
