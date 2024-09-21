@@ -34,7 +34,7 @@ func LogEvent(event string, rest ...any) {
 
 func main() {
 	wwwDir := flag.String("www", "www", "directory with files to be served")
-	wwwPort := flag.Int("port", 8001, "http port")
+	wwwPort := flag.Int("port", 8000, "http port")
 
 	flag.Parse()
 
@@ -51,6 +51,6 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now().UnixNano())
-	time.Sleep(time.Duration(rand.Intn(10))*time.Second)
+	time.Sleep(time.Duration(rand.Intn(15))*time.Second)
 	fmt.Fprint(w, "Hello !")
 }

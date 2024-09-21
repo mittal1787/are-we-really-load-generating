@@ -1,4 +1,5 @@
 from datetime import datetime 
+from scp import SCPClient
 import matplotlib.pyplot as plt
 import time
 import itertools
@@ -17,6 +18,7 @@ rps_counts = [500, 1000, 5000, 10000, 50000, 100000]
 
 DATA_DIR_WRK2_DSB = "data-wrk2-dsb-multimachine"
 DATA_DIR = "data-wrk2"
+DATA_DIR_K6 = "data-k6"
 
 def create_latency_histogram(timestamp_file:str, file_to_save:str):
     with open(timestamp_file, "r", encoding="utf-8") as f:
@@ -136,8 +138,8 @@ def read_client_tcpdump(ssh_user:str, client_hostname:str, server_machine_name: 
     print("read_client_tcpdump: Finished reading tcpdump")
     ssh_con.close()
 
-def run_server(ssh_user:str, client_hostname:str, server_machine_name: str, thread_count: int, conn_count: int, rps:int, experiment_name:str, barrier):
-    filename = f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}/t{thread_count}-c{conn_count}-rps{rps}/server_arrival_times.csv"
+def run_server(ssh_user:str, server_machine_name: str, experiment_name:str, dir_name:str, barrier):
+    filename = f"{dir_name}/server_arrival_times.csv"
     file_to_write = open(filename,"w")
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
@@ -152,7 +154,7 @@ def run_server(ssh_user:str, client_hostname:str, server_machine_name: str, thre
     stdin, stdout, stderr = ssh_con.exec_command("cat timestamp.txt")
     file_to_write.write(stdout.read().decode().replace('\x00',''))
     file_to_write.close()
-    create_latency_histogram(filename,  f"new-experiments/{experiment_name}/{DATA_DIR}/client={client_hostname}-server={server_machine_name}/t{thread_count}-c{conn_count}-rps{rps}/server_arrival_times.png")
+    create_latency_histogram(filename,  f"{dir_name}/server_arrival_times.png")
     print("Finished running server")
     ssh_con.close()
 
@@ -183,7 +185,7 @@ def run_wrk2(client_hostname:str, server_machine_name: str, experiment_name: str
                 os.makedirs(dir_name, exist_ok=True)
                 barrier = threading.Barrier(6)
                 py_threads = []
-                py_threads.append(threading.Thread(target=run_server, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, experiment_name, barrier)))
+                py_threads.append(threading.Thread(target=run_server, args=(ssh_user, server_machine_name, experiment_name, dir_name, barrier)))
                 py_threads.append(threading.Thread(target=read_wrk_cpu_utilization, args=(ssh_user, client_hostname, dir_name, barrier)))
                 py_threads.append(threading.Thread(target=read_server_cpu_utilization, args=(ssh_user, dir_name, server_machine_name, "main", barrier)))
                 py_threads.append(threading.Thread(target=run_wrk2_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, experiment_name, port, lua_script_path, dir_name, barrier)))
@@ -252,7 +254,7 @@ def run_wrk2_dsb(client_hostname:str, server_machine_name: str, experiment_name:
                     os.makedirs(dir_name, exist_ok=True)
                     barrier = threading.Barrier(6)
                     py_threads = []
-                    py_threads.append(threading.Thread(target=run_server, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, experiment_name, barrier)))
+                    py_threads.append(threading.Thread(target=run_server, args=(ssh_user, server_machine_name, experiment_name, dir_name, barrier)))
                     py_threads.append(threading.Thread(target=read_wrk_cpu_utilization, args=(ssh_user, client_hostname, dir_name, barrier)))
                     py_threads.append(threading.Thread(target=read_server_cpu_utilization, args=(ssh_user, dir_name, server_machine_name, "main", barrier)))
                     py_threads.append(threading.Thread(target=run_wrk2_dsb_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, distr, port, experiment_name, lua_script_path, dir_name, barrier)))
@@ -291,7 +293,7 @@ def create_k6_constant_arrival_script_file(vus:int, server_hostname:str, port:st
             rate:""" + str(vus) + """,
             timeUnit: '1s',
             duration: '1m',
-            preAllocatedVUs:""" + str(vus) + """ ,
+            preAllocatedVUs:""" + str(vus+5) + """ ,
             },
         },
     };
@@ -302,7 +304,7 @@ def create_k6_constant_arrival_script_file(vus:int, server_hostname:str, port:st
     """
 
 def create_k6_ramping_arrival_script_file(vus:int, server_hostname:str, port:str):
-    """
+    return """
     import http from 'k6/http';
     
     export const options = {
@@ -321,3 +323,59 @@ def create_k6_ramping_arrival_script_file(vus:int, server_hostname:str, port:str
         http.get('http://""" + server_hostname + ":" + port +  """');
     }
     """
+
+def run_k6_on_client_machine(ssh_user:str, client_hostname:str, server_hostname:str, port:str, vus:int, dir_name:str, barrier):
+    ssh_con = paramiko.SSHClient()
+    ssh_con.load_system_host_keys()
+    print("run_k6_on_client_machine: client_hostname=",client_hostname,", ssh_user=",ssh_user)
+    ssh_con.connect(client_hostname, username=ssh_user)
+    scp = SCPClient(ssh_con.get_transport())
+    script_file = open(f"{dir_name}/script.js", "w")
+    script_file.write(create_k6_constant_arrival_script_file(vus,server_hostname, port))
+    script_file.close()
+    scp.put(f"{dir_name}/script.js","script.js")
+    barrier.wait()
+    stdin, stdout, stderr = ssh_con.exec_command("k6 run --out json=test_results.json script.js", timeout=120)
+    file_to_write = open(f"{dir_name}/k6_results.txt","w")
+    file_to_write.write(stdout.read().decode("utf-8"))
+    file_to_write.close()
+    scp.get("test_results.json", f"{dir_name}/k6_results.json")
+    scp.close()
+    ssh_con.close()
+
+def read_k6_cpu_utilization(ssh_user:str, machine_name:str, dir_name:str, barrier):
+    file_to_write = open(f"{dir_name}/k6-cpu-util.csv","w")
+    file_to_write.write("PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n")
+    ssh_con = paramiko.SSHClient()
+    ssh_con.load_system_host_keys()
+    ssh_con.connect(machine_name, username=ssh_user)
+    barrier.wait()
+    for i in range(60):
+        stdin, stdout, stderr = ssh_con.exec_command(f"top -b -n1 | grep k6")
+        file_to_write.write(stdout.read().decode("utf-8")[2:])
+        # print(stderr.read())
+        time.sleep(1)
+    file_to_write.close()
+    ssh_con.close()
+    print("k6 CPU utilization done")
+
+def run_k6(client_hostname:str, server_machine_name: str, experiment_name: str, lua_script_path: str = None, ssh_user: str = None, port:str = "8000"):
+    for rps in rps_counts:
+        print(f"run_k6: RPS = {rps}")
+        dir_name = f"new-experiments/{experiment_name}/{DATA_DIR_K6}/client={client_hostname}-server={server_machine_name}/rps{rps}"
+        os.makedirs(dir_name, exist_ok=True)
+        barrier = threading.Barrier(6)
+        py_threads = []
+        py_threads.append(threading.Thread(target=run_server, args=(ssh_user, server_machine_name, experiment_name, dir_name, barrier)))
+        py_threads.append(threading.Thread(target=read_k6_cpu_utilization, args=(ssh_user, client_hostname, dir_name, barrier)))
+        py_threads.append(threading.Thread(target=read_server_cpu_utilization, args=(ssh_user, dir_name, server_machine_name, "main", barrier)))
+        py_threads.append(threading.Thread(target=run_k6_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, port, dir_name, barrier)))
+        py_threads.append(threading.Thread(target=read_client_tcpdump, args=(ssh_user, client_hostname, server_machine_name, dir_name, barrier)))
+
+        for py_thread in py_threads:
+            py_thread.start()
+        # Signal the threads to begin
+        barrier.wait()
+        for py_thread in py_threads:
+            py_thread.join()
+        time.sleep(5)         
