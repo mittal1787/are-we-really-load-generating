@@ -12,3 +12,4 @@ for stdout_line in iter(p.stdout.readline, ""):
     if time.time() >= t_end:
         break
 os.killpg(os.getpgid(p.pid), signal.SIGTERM)
+os.killpg(os.getpgid(p.pid), signal.SIGKILL)

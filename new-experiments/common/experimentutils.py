@@ -16,7 +16,7 @@ thread_counts = [1, 2, 4, 8, 10, 12, 16, 24]
 rps_counts = [500, 1000, 5000, 10000, 50000, 100000]
 
 
-DATA_DIR_WRK2_DSB = "data-wrk2-dsb-multimachine"
+DATA_DIR_WRK2_DSB = "data-wrk2-dsb"
 DATA_DIR = "data-wrk2"
 DATA_DIR_K6 = "data-k6"
 
@@ -144,6 +144,11 @@ def run_server(ssh_user:str, server_machine_name: str, experiment_name:str, dir_
     ssh_con = paramiko.SSHClient()
     ssh_con.load_system_host_keys()
     ssh_con.connect(server_machine_name, username=ssh_user)
+    stdin, stdout, stderr = ssh_con.exec_command("sudo lsof -i -P -n | grep *:8000")
+    str_data = re.sub(' +', ' ',stdout.read().decode())
+    print("run_server:", str_data)
+    if len(str_data) > 0:
+        stdin, stdout, stderr = ssh_con.exec_command(f"kill {int(str_data.split()[1])}")
     ssh_con.exec_command(f"go run are-we-really-load-generating/new-experiments/{experiment_name}/main.go > timestamp.txt")
     barrier.wait()
     time.sleep(60)
@@ -257,7 +262,7 @@ def run_wrk2_dsb(client_hostname:str, server_machine_name: str, experiment_name:
                     py_threads.append(threading.Thread(target=run_server, args=(ssh_user, server_machine_name, experiment_name, dir_name, barrier)))
                     py_threads.append(threading.Thread(target=read_wrk_cpu_utilization, args=(ssh_user, client_hostname, dir_name, barrier)))
                     py_threads.append(threading.Thread(target=read_server_cpu_utilization, args=(ssh_user, dir_name, server_machine_name, "main", barrier)))
-                    py_threads.append(threading.Thread(target=run_wrk2_dsb_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, distr, port, experiment_name, lua_script_path, dir_name, barrier)))
+                    py_threads.append(threading.Thread(target=run_wrk2_dsb_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, thread, conn, rps, distr, port, lua_script_path, dir_name, barrier)))
                     py_threads.append(threading.Thread(target=read_client_tcpdump, args=(ssh_user, client_hostname, server_machine_name, dir_name, barrier)))
 
                     for py_thread in py_threads:
@@ -369,7 +374,7 @@ def run_k6(client_hostname:str, server_machine_name: str, experiment_name: str, 
         py_threads.append(threading.Thread(target=run_server, args=(ssh_user, server_machine_name, experiment_name, dir_name, barrier)))
         py_threads.append(threading.Thread(target=read_k6_cpu_utilization, args=(ssh_user, client_hostname, dir_name, barrier)))
         py_threads.append(threading.Thread(target=read_server_cpu_utilization, args=(ssh_user, dir_name, server_machine_name, "main", barrier)))
-        py_threads.append(threading.Thread(target=run_k6_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, port, dir_name, barrier)))
+        py_threads.append(threading.Thread(target=run_k6_on_client_machine, args=(ssh_user, client_hostname, server_machine_name, port, rps, dir_name, barrier)))
         py_threads.append(threading.Thread(target=read_client_tcpdump, args=(ssh_user, client_hostname, server_machine_name, dir_name, barrier)))
 
         for py_thread in py_threads:
